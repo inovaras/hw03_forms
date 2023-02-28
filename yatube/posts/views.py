@@ -1,9 +1,12 @@
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
-from .models import Post, Group
+from .models import Group
+from .models import Post
+from .models import User
 
 
 @login_required()
@@ -37,8 +40,11 @@ def profile(request, username):
     paginator = Paginator(post_list, settings.POSTS_NUMBERS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
+    annotated_results = User.objects.annotate(posts_count=Count('posts'))
     context = {
         'page_obj': page_obj,
+        'annotated_results': annotated_results,
+
     }
 
     return render(request, 'posts/profile.html', context)

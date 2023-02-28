@@ -6,8 +6,10 @@
   <body>
     <main>
       <div class="container py-5">
-        <h1>Все посты пользователя <!--Лев Толстой--> </h1>
-        <h3>Всего постов: <!-- --> </h3>
+         {% for item in annotated_results %}
+           <h1>Все посты пользователя <!--Лев Толстой--> </h1>
+           <h3>Всего постов: {{item.username}}: {{item.posts_count}} </h3>
+         {% endfor %}
         <article>
           <ul>
             <li>
@@ -33,7 +35,7 @@
           </p>
           <a href="<!-- -->">подробная информация </a>
         </article>
-        <a href="<!-- -->">все записи группы</a>
+          <a href="">все записи группы</a>
         <hr>
         <!-- Остальные посты. после последнего нет черты -->
         {% include 'posts/includes/paginator.html' %}
