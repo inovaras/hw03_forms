@@ -40,10 +40,11 @@ def profile(request, username):
     paginator = Paginator(post_list, settings.POSTS_NUMBERS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    annotated_results = User.objects.annotate(posts_count=Count('posts'))
+    annotated_results = User.objects.filter(username=username).annotate(posts_count=Count('posts'))
     context = {
         'page_obj': page_obj,
         'annotated_results': annotated_results,
+
 
     }
 
