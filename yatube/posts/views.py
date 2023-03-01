@@ -50,6 +50,7 @@ def post_detail(request, post_id):
     post = Post.objects.get(id=post_id)
     context = {
         'post': post,
+        'is_edit': True
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -57,11 +58,22 @@ def post_detail(request, post_id):
 def post_create(request):
     if request.method == 'POST':
         form = PostForm(request.POST)
-
         if form.is_valid():
             form.instance.author = request.user
             form.save()
             return redirect('posts:profile', username=request.user.username)
-        return render(request, 'posts/create.html', {'form': form})
+        return render(request, 'posts/create.html', {'form': form, 'is_edit': False})
     form = PostForm()
-    return render(request, 'posts/create.html', {'form': form})
+    return render(request, 'posts/create.html', {'form': form, 'is_edit': False})
+
+
+def post_edit(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            form.instance.author = request.user
+            form.save()
+            return redirect('posts:profile', username=request.user.username)
+        return render(request, 'posts/update_post.html', {'form': form})
+    form = PostForm()
+    return render(request, 'posts/update_post.html', {'form': form})
