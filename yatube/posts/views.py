@@ -8,7 +8,6 @@ from .models import Post
 from .models import User
 
 
-@login_required()
 def index(request):
     post_list = Post.objects.all()
     paginator = Paginator(post_list, settings.POSTS_NUMBERS)
