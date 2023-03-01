@@ -6,32 +6,13 @@
   <body>
     <main>
       <div class="container py-5">
-        {% for item in annotated_results %}
-          <h1>Все посты пользователя {{item.username}} </h1>
-          <h3>Всего постов {{item.username}}: {{item.posts_count}} </h3>
-        {% endfor %}
+          <h1>Все посты пользователя {{author}} </h1>
+          <h3>Всего постов: {{author.posts.count}} </h3>
+          {% for post in page_obj %}
            <article>
-             <ul>
-               <li>
-                 Автор: {{annotated_results.text}}
-                 <a href="<!-- -->">все посты пользователя</a>
-               </li>
-               <li>
-                 Дата публикации: <!-- 31 июля 1854 -->
-               </li>
-             </ul>
-             <p>
-               {% for post in page_obj %}
-                 {% include "includes/posts_rendering.html" %}
-               {% endfor %}
-             </p>
-             <a href="<!-- -->">подробная информация </a>
+             {% include "includes/posts_rendering.html" with show_group_link=True %}
            </article>
-           <a href="!-- --">все записи группы</a>
-           <hr>
-
-        {% endfor %}
-        <!-- Остальные посты. после последнего нет черты -->
+           {% endfor %}
         {% include 'posts/includes/paginator.html' %}
       </div>
     </main>

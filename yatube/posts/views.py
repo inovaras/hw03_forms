@@ -1,7 +1,6 @@
 from django.core.paginator import Paginator
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from .models import Group
@@ -35,24 +34,21 @@ def group_posts(request, slug):
 
 
 def profile(request, username):
-    # Здесь код запроса к модели и создание словаря контекста
-    post_list = Post.objects.all()
+    author = User.objects.get(username=username)
+    post_list = Post.objects.filter(author=author)
     paginator = Paginator(post_list, settings.POSTS_NUMBERS)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    annotated_results = User.objects.filter(username=username).annotate(posts_count=Count('posts'))
     context = {
         'page_obj': page_obj,
-        'annotated_results': annotated_results,
-
-
+        'author': author,
     }
-
     return render(request, 'posts/profile.html', context)
 
 
 def post_detail(request, post_id):
-    # Здесь код запроса к модели и создание словаря контекста
+    post = Post.objects.get(id=post_id)
     context = {
+        'post': post,
     }
     return render(request, 'posts/post_detail.html', context)

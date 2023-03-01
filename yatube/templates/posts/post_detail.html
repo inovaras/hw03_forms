@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block title %}
-    <!-- Подключены иконки, стили и заполенены мета теги -->
-    <title>Пост <!-- Первые 30 букв поста --></title>
+  {{post|truncatechars:9 }}
 {% endblock %}
 {% block content %}
   <body>
@@ -10,23 +9,23 @@
         <aside class="col-12 col-md-3">
           <ul class="list-group list-group-flush">
             <li class="list-group-item">
-              Дата публикации: <!-- 31 июля 1854 --> 
-            </li>
-            <!-- если у поста есть группа -->   
-            <li class="list-group-item">
-              Группа: <!-- Название группы -->
-              <a href="<!-- -->">
-                все записи группы
-              </a>
+              Дата публикации: {{post.pub_date|date:"d E Y"}}
             </li>
             <li class="list-group-item">
-              Автор: <!--Лев Толстой-->
+              {% if post.group %}
+              Группа: {{post.group}}
+              <br>
+                <a href="{% url 'posts:group_list' post.group.slug %}">все записи группы</a>
+              {% endif %}
+            </li>
+            <li class="list-group-item">
+              Автор: {{post.author}}
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
-              Всего постов автора:  <span ><!-- --></span>
+              Всего постов автора: {{post.author.posts.count}}
             </li>
             <li class="list-group-item">
-              <a href="<!-- -->">
+              <a href="{% url 'posts:profile' post.author.username %}">
                 все посты пользователя
               </a>
             </li>
@@ -34,17 +33,7 @@
         </aside>
         <article class="col-12 col-md-9">
           <p>
-           <!--
-            [Фокшаны.] Еще переходъ до Фокшанъ, во время котораго я ѣхалъ съ
-            Монго. Человѣкъ пустой, но съ твердыми, хотя и ложными убѣжденіями.
-            Генерал[у] по этому должно быть случаю, угодно было спрашивать о мое
-            мъ здоровьи.
-            Свинья! К[о]вырялъ носъ и ничего не написалъ — вотъ 2 упрека за
-            нын[ѣшній]     день. Послѣдній упрекъ становится слишкомъ частъ,
-            хотя походъ и можетъ служить въ немъ отчасти извиненіемъ.
-            Отношенія мои съ товарищами становятся такъ пріятны, что мнѣ
-            жалко бросить штабъ. Здоровье кажется (2) лучше.
-           -->
+            {{post.text}}
           </p>
         </article>
       </div> 
