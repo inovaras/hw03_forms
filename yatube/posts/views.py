@@ -77,6 +77,10 @@ def post_edit(request, post_id):
         if form.is_valid():
             form.save()
             return redirect('posts:post_detail', post_id=post_id)
-        return render(request, 'posts/create.html', {'form': form, 'is_edit': True})
+        return render(
+            request, 'posts/create.html', {'form': form, 'is_edit': True}
+        )
     form = PostForm(instance=post)
-    return render(request, 'posts/create.html', {'form': form, 'is_edit': True})
+    return render(
+        request, 'posts/create.html', {'form': form, 'is_edit': True}
+    )
