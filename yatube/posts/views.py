@@ -68,13 +68,15 @@ def post_create(request):
     )
 
 
-def post_edit(request):
+def post_edit(request, post_id):
+    post = Post.objects.get(id=post_id)
+    if request.user != post.author:
+        return redirect('posts:post_detail', post_id=post_id)
     if request.method == 'POST':
-        form = PostForm(request.POST)
+        form = PostForm(request.POST, instance=post)
         if form.is_valid():
-            form.instance.author = request.user
             form.save()
-            return redirect('posts:profile', username=request.user.username)
-        return render(request, 'posts/update_post.html', {'form': form})
-    form = PostForm()
-    return render(request, 'posts/update_post.html', {'form': form})
+            return redirect('posts:post_detail', post_id=post_id)
+        return render(request, 'posts/create.html', {'form': form, 'is_edit': True})
+    form = PostForm(instance=post)
+    return render(request, 'posts/create.html', {'form': form, 'is_edit': True})
