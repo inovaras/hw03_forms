@@ -60,7 +60,7 @@ def post_create(request):
     if not form.is_valid():
         return render(
             request, 'posts/create.html', {'form': form, 'is_edit': False}
-            )
+        )
     post = form.save(commit=False)
     post.author = request.user
     post.save()
