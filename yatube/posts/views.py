@@ -3,6 +3,8 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
 from .forms import PostForm
 from .models import Group
 from .models import Post
@@ -52,35 +54,28 @@ def post_detail(request, post_id):
     return render(request, 'posts/post_detail.html', context)
 
 
+@login_required()
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            form.instance.author = request.user
-            form.save()
-            return redirect('posts:profile', username=request.user.username)
+    form = PostForm(request.POST or None)
+    if not form.is_valid():
         return render(
             request, 'posts/create.html', {'form': form, 'is_edit': False}
-        )
-    form = PostForm()
-    return render(
-        request, 'posts/create.html', {'form': form, 'is_edit': False}
-    )
+            )
+    post = form.save(commit=False)
+    post.author = request.user
+    post.save()
+    return redirect('posts:profile', username=request.user.username)
 
 
+@login_required()
 def post_edit(request, post_id):
     post = Post.objects.get(id=post_id)
     if request.user != post.author:
         return redirect('posts:post_detail', post_id=post_id)
-    if request.method == 'POST':
-        form = PostForm(request.POST, instance=post)
-        if form.is_valid():
-            form.save()
-            return redirect('posts:post_detail', post_id=post_id)
-        return render(
-            request, 'posts/create.html', {'form': form, 'is_edit': True}
-        )
-    form = PostForm(instance=post)
+    form = PostForm(request.POST or None, instance=post)
+    if form.is_valid():
+        form.save()
+        return redirect('posts:post_detail', post_id=post_id)
     return render(
         request, 'posts/create.html', {'form': form, 'is_edit': True}
     )
