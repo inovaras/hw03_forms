@@ -18,9 +18,14 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text='Текст поста должен обрезаться по первым 15ти символам ',
         )
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        pass
+        post = PostModelTest.post
+        expected_object_name = post.text[:15]
+        self.assertEqual(expected_object_name, str(post))
+        group = PostModelTest.group
+        expected_object_name = group.title
+        self.assertEqual(expected_object_name, str(group))
