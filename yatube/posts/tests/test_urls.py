@@ -1,28 +1,38 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 
-from ..models import Post
-
-User = get_user_model()
+from ..models import Post, User, Group
 
 
 class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        Post.objects.create(
+        cls.user = User.objects.create_user(username='author')
+        cls.group = Group.objects.create(slug='slug')
+        cls.post = Post.objects.create(
             text='Проверочный текст',
-            pub_date='01.01.01',
-            author='test_author',
-            group='test_group'
+            author=cls.user,
+            group=cls.group
         )
 
     def setUp(self):
         self.guest_client = Client()
-        self.user = User.objects.create_user(username='HasNoName')
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
-    def test_homepage(self):
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, 200)
+    def test_urls_uses_correct_template(self):
+        """URL-адрес использует соответствующий шаблон."""
+        # Шаблоны по адресам
+        template_url_name = (
+            (f'/group/{self.group.slug}/', 'posts/group_list.html'),
+            (f'/profile/{self.user.username}/', 'posts/profile.html'),
+            (f'/posts/{self.post.id}/', 'posts/post_detail.html'),
+            ('/create/', 'posts/create.html'),
+            (f'/posts/{self.post.id}/edit/', 'posts/create.html')
+        )
+
+        for address, template in template_url_name:
+            with self.subTest(address=address):
+                response = self.authorized_client.get(address)
+                self.assertTemplateUsed(response, template)
