@@ -134,3 +134,19 @@ class PaginatorViewsTest(TestCase):
     def test_second_page_contains_three_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_first_page_group_list_contains_ten_records(self):
+        response = self.client.get(reverse('posts:group_list', kwargs={'slug': self.group.slug}))
+        self.assertEqual(len(response.context['page_obj']), settings.POSTS_NUMBERS)
+
+    def test_second_page_group_list_contains_three_records(self):
+        response = self.client.get(reverse('posts:group_list', kwargs={'slug': self.group.slug}) + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_first_page_profile_contains_ten_records(self):
+        response = self.client.get(reverse('posts:profile', kwargs={'username': self.user.username}))
+        self.assertEqual(len(response.context['page_obj']), settings.POSTS_NUMBERS)
+
+    def test_second_page_profile_contains_three_records(self):
+        response = self.client.get(reverse('posts:profile', kwargs={'username': self.user.username}) + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), 3)
