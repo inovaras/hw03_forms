@@ -48,7 +48,7 @@ class PostPagesTests(TestCase):
     def test_index_pages_show_correct_context(self):
         """Шаблон index сформирован с правильным контекстом."""
         response = (self.authorized_client.
-                    get(reverse('posts:profile', kwargs={'username': self.user.username})))
+                    get(reverse('posts:index')))
         post = response.context['page_obj'][0]
         self.check_context(post)
 
@@ -95,19 +95,42 @@ class PostPagesTests(TestCase):
             'text': forms.fields.CharField,
             'group': forms.fields.ChoiceField
         }
-        # Проверяем, что типы полей формы в словаре context соответствуют ожиданиям
         for value, expected in form_fields.items():
             with self.subTest(value=value):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
 
     def test_post_doesnt_appear_in_another_group(self):
+        """Проверка, что пост не попал в другую группу."""
         response = (self.authorized_client.
                     get(
             reverse('posts:group_list', kwargs={'slug': self.another_group.slug})))
         posts = response.context['page_obj']
         self.assertEqual(len(posts), 0)
 
-class PaginatorViewsTest(TestCase):
-    pass
 
+class PaginatorViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.user = User.objects.create_user(username='author')
+        cls.group = Group.objects.create(slug='slug')
+
+        for i in range(13):
+            Post.objects.create(
+                text='Тут много-много-много текста :)',
+                author=cls.user,
+                group=cls.group
+            )
+
+    def setUp(self):
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.user)
+
+    def test_first_page_contains_ten_records(self):
+        response = self.client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), settings.POSTS_NUMBERS)
+
+    def test_second_page_contains_three_records(self):
+        response = self.client.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), 3)
