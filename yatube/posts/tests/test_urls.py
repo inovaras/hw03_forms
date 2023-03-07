@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 
-from ..models import Post, User, Group
+from ..models import Group, Post, User
 
 
 class PostURLTests(TestCase):
@@ -23,7 +23,6 @@ class PostURLTests(TestCase):
 
     def test_urls_uses_correct_template(self):
         """URL-адрес использует соответствующий шаблон."""
-        # Шаблоны по адресам
         template_url_name = (
             (f'/group/{self.group.slug}/', 'posts/group_list.html'),
             (f'/profile/{self.user.username}/', 'posts/profile.html'),
