@@ -115,13 +115,16 @@ class PaginatorViewsTest(TestCase):
         super().setUpClass()
         cls.user = User.objects.create_user(username='author')
         cls.group = Group.objects.create(slug='slug')
-
-        for i in range(13):
-            Post.objects.create(
+        cls.SECOND_PAGE_COUNT = 3
+        posts_lst = []
+        for i in range(settings.POSTS_NUMBERS+cls.SECOND_PAGE_COUNT):
+            posts_lst.append(Post(
                 text='Тут много-много-много текста :)',
                 author=cls.user,
                 group=cls.group
+                )
             )
+        Post.objects.bulk_create(posts_lst)
 
     def setUp(self):
         self.authorized_client = Client()
@@ -133,7 +136,7 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_contains_three_records(self):
         response = self.client.get(reverse('posts:index') + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']), self.SECOND_PAGE_COUNT)
 
     def test_first_page_group_list_contains_ten_records(self):
         response = self.client.get(reverse('posts:group_list', kwargs={'slug': self.group.slug}))
@@ -141,7 +144,7 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_group_list_contains_three_records(self):
         response = self.client.get(reverse('posts:group_list', kwargs={'slug': self.group.slug}) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']), self.SECOND_PAGE_COUNT)
 
     def test_first_page_profile_contains_ten_records(self):
         response = self.client.get(reverse('posts:profile', kwargs={'username': self.user.username}))
@@ -149,4 +152,4 @@ class PaginatorViewsTest(TestCase):
 
     def test_second_page_profile_contains_three_records(self):
         response = self.client.get(reverse('posts:profile', kwargs={'username': self.user.username}) + '?page=2')
-        self.assertEqual(len(response.context['page_obj']), 3)
+        self.assertEqual(len(response.context['page_obj']), self.SECOND_PAGE_COUNT)
